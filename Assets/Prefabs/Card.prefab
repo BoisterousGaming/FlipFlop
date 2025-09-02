@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 2197183578120446722}
   - component: {fileID: 2197183578120446725}
   - component: {fileID: 5922596049759498377}
+  - component: {fileID: 9220262371022285571}
   m_Layer: 5
   m_Name: Card
   m_TagString: Untagged
@@ -69,7 +70,7 @@ MonoBehaviour:
       m_Calls: []
   m_Sprite: {fileID: 21300000, guid: 4c7a580357dfd6846a027667e23aa7d5, type: 3}
   m_Type: 0
-  m_PreserveAspect: 1
+  m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -89,3 +90,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5326463dde266b04281a32ad3cfb1092, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  img: {fileID: 2197183578120446725}
+  cardFlipper: {fileID: 9220262371022285571}
+--- !u!114 &9220262371022285571
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2197183578120446727}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f084c4dca066c784fb03be699433e84f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  img: {fileID: 2197183578120446725}
+  imgRect: {fileID: 2197183578120446724}
+  duration: 0.5

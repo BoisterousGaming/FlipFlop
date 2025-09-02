@@ -3,48 +3,62 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-
 public class Card : MonoBehaviour, IPointerDownHandler
 {
+    public int CardID => cardID;
+    public bool IsFlipped => isFlipped;
+
     private int cardID;
     private bool isFlipped;
+    private bool isFlipping;
 
     private Sprite frontSprite;
     private Sprite backSprite;
-    private Image image;
 
-    private Action<Card> onCardTapped;
+    private Action<int> onCardTapped;
 
+    [SerializeField] private Image img;
     [SerializeField] private CardFlipper cardFlipper;
 
-    private void Awake()
+    public void SetCardDetails(int cardID, Sprite frontSprite, Sprite backSprite)
     {
-        image = GetComponent<Image>();
-    }
-
-    public void SetCardSpriteReferences(Sprite frontSide, Sprite backSide)
-    {
-        frontSprite = frontSide;
-        backSprite = backSide;
-        image.sprite = backSprite;
-    }
-
-    public void ShowFront()
-    {
-        isFlipped = true;
-        _ = cardFlipper.DoFlipAsync(frontSprite);
-    }
-
-    public void ShowBack()
-    {
+        this.cardID = cardID;
+        this.frontSprite = frontSprite;
+        this.backSprite = backSprite;
+        img.sprite = backSprite;
         isFlipped = false;
-        _ = cardFlipper.DoFlipAsync(backSprite);
     }
 
-    #region IPointerDownHandler
+    public void RegisterOnTapped(Action<int> callback)
+    {
+        onCardTapped = callback;
+    }
+
+    public void ShowCardFront()
+    {
+        if (isFlipping) return;
+        isFlipping = true;
+        cardFlipper.DoFlip(frontSprite, () =>
+        {
+            isFlipping = false;
+            isFlipped = true;
+        });
+    }
+
+    public void ShowCardBack()
+    {
+        if (isFlipping) return;
+        isFlipping = true;
+        cardFlipper.DoFlip(backSprite, () =>
+        {
+            isFlipping = false;
+            isFlipped = false;
+        });
+    }
+
     public void OnPointerDown(PointerEventData eventData)
     {
-        onCardTapped?.Invoke(this);
+        if (isFlipping) return;
+        onCardTapped?.Invoke(cardID);
     }
-    #endregion
 }

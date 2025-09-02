@@ -10,7 +10,6 @@ public class CardFlipper : MonoBehaviour
     [SerializeField] private float duration = 0.5f;
 
     private Vector3 scaleCache = Vector3.one;
-    private bool isFlipping;
 
     private void Awake()
     {
@@ -18,19 +17,15 @@ public class CardFlipper : MonoBehaviour
             scaleCache = imgRect.localScale;
     }
 
-    public async Task DoFlipAsync(Sprite cardSprite, Action onComplete = null)
+    public void DoFlip(Sprite cardSprite, Action onComplete)
     {
-        if (isFlipping || img == null || imgRect == null) return;
-
-        isFlipping = true;
-        await DoFlipTask(cardSprite, onComplete);
-        isFlipping = false;
+        if (img == null || imgRect == null) return;
+        AudioSfxHandler.Instance.PlayAudioOneShot(Enums.AudioSfxType.CardFlip);
+        _ = DoFlipTask(cardSprite, onComplete);
     }
 
     private async Task DoFlipTask(Sprite cardSprite, Action onComplete)
     {
-        AudioSfxHandler.Instance.PlayAudioOneShot(Enums.AudioSfxType.CardFlip);
-
         float halfDuration = duration / 2f;
 
         // Let's srink the card x scale to 0
