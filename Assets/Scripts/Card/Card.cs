@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class Card : MonoBehaviour, IPointerDownHandler
 {
     private int cardID;
-    private bool isFlipped = false;
+    private bool isFlipped;
 
     private Sprite frontSprite;
     private Sprite backSprite;
@@ -15,31 +15,36 @@ public class Card : MonoBehaviour, IPointerDownHandler
 
     private Action<Card> onCardTapped;
 
-    void Awake()
+    [SerializeField] private CardFlipper cardFlipper;
+
+    private void Awake()
     {
         image = GetComponent<Image>();
-        ShowBack();
     }
 
-    public void OnPointerDown(PointerEventData eventData)
+    public void SetCardSpriteReferences(Sprite frontSide, Sprite backSide)
     {
-        onCardTapped?.Invoke(this);
-    }
-
-    private void SetImage(Sprite sprite, bool frontSide)
-    {
-        image.sprite = sprite;
-        isFlipped = frontSide;
-        // TODO - Do card flip animation & play flip sound
+        frontSprite = frontSide;
+        backSprite = backSide;
+        image.sprite = backSprite;
     }
 
     public void ShowFront()
     {
-        SetImage(frontSprite, true);
+        isFlipped = true;
+        _ = cardFlipper.DoFlipAsync(frontSprite);
     }
 
     public void ShowBack()
     {
-        SetImage(backSprite, false);
+        isFlipped = false;
+        _ = cardFlipper.DoFlipAsync(backSprite);
     }
+
+    #region IPointerDownHandler
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        onCardTapped?.Invoke(this);
+    }
+    #endregion
 }
