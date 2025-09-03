@@ -1,11 +1,10 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(RectTransform))]
 public class CardGridHandler : MonoBehaviour
 {
-    [Min(2)][SerializeField] private int rows = 2;
-    [Min(2)][SerializeField] private int columns = 2;
     [SerializeField] private Vector2 spacing = new Vector2(10f, 10f);
     [SerializeField] private bool forceSquare = true; // This bool allow to toggle between square vs rectangle card shape
     [SerializeField] private GameObject cardPrefab;
@@ -17,15 +16,18 @@ public class CardGridHandler : MonoBehaviour
 
     public IReadOnlyList<Card> Cards => cards;
 
+    public int Rows { get; set; }
+    public int Columns { get; set; }
+
     private void Awake()
     {
         container = GetComponent<RectTransform>();
     }
 
     // Let's Generate a new card grid with matching pairs
-    public void GenerateGrid(System.Action<int> onCardTapped)
+    public void GenerateGrid(Action<Card> onCardTapped)
     {
-        int totalCards = rows * columns;
+        int totalCards = Rows * Columns;
         if (totalCards % 2 != 0)
         {
             Debug.LogError("Total cards must be even to form pairs!");
@@ -69,13 +71,13 @@ public class CardGridHandler : MonoBehaviour
     // Update positions and sizes of all cards to fit inside the container
     public void UpdateGridLayout()
     {
-        if (rows <= 0 || columns <= 0) return;
+        if (Rows <= 0 || Columns <= 0) return;
 
         float containerWidth = container.rect.width;
         float containerHeight = container.rect.height;
 
-        float cellWidth = (containerWidth - (spacing.x * (columns - 1))) / columns;
-        float cellHeight = (containerHeight - (spacing.y * (rows - 1))) / rows;
+        float cellWidth = (containerWidth - (spacing.x * (Columns - 1))) / Columns;
+        float cellHeight = (containerHeight - (spacing.y * (Rows - 1))) / Rows;
 
         // If force square, pick the smaller dimension
         if (forceSquare)
@@ -84,8 +86,8 @@ public class CardGridHandler : MonoBehaviour
             cellWidth = cellHeight = cellSize;
         }
 
-        float totalGridWidth = (cellWidth * columns) + (spacing.x * (columns - 1));
-        float totalGridHeight = (cellHeight * rows) + (spacing.y * (rows - 1));
+        float totalGridWidth = (cellWidth * Columns) + (spacing.x * (Columns - 1));
+        float totalGridHeight = (cellHeight * Rows) + (spacing.y * (Rows - 1));
 
         float startX = -totalGridWidth / 2 + cellWidth / 2;
         float startY = totalGridHeight / 2 - cellHeight / 2;
@@ -99,8 +101,8 @@ public class CardGridHandler : MonoBehaviour
 
         for (int i = 0; i < cards.Count; i++)
         {
-            int row = i / columns;
-            int column = i % columns;
+            int row = i / Columns;
+            int column = i % Columns;
 
             var cardRect = cards[i].GetComponent<RectTransform>();
             if (cardRect == null) continue;
@@ -120,7 +122,7 @@ public class CardGridHandler : MonoBehaviour
     {
         for (int i = container.childCount - 1; i >= 0; i--)
         {
-            DestroyImmediate(container.GetChild(i).gameObject);
+            Destroy(container.GetChild(i).gameObject);
         }
     }
 
@@ -128,7 +130,7 @@ public class CardGridHandler : MonoBehaviour
     {
         for (int i = list.Count - 1; i > 0; i--)
         {
-            int rand = Random.Range(0, i + 1);
+            int rand = UnityEngine.Random.Range(0, i + 1);
             (list[i], list[rand]) = (list[rand], list[i]);
         }
     }

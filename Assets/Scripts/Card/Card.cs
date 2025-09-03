@@ -15,7 +15,7 @@ public class Card : MonoBehaviour, IPointerDownHandler
     private Sprite frontSprite;
     private Sprite backSprite;
 
-    private Action<int> onCardTapped;
+    private Action<Card> onCardTapped;
 
     [SerializeField] private Image img;
     [SerializeField] private CardFlipper cardFlipper;
@@ -29,7 +29,7 @@ public class Card : MonoBehaviour, IPointerDownHandler
         isFlipped = false;
     }
 
-    public void RegisterOnTapped(Action<int> callback)
+    public void RegisterOnTapped(Action<Card> callback)
     {
         onCardTapped = callback;
     }
@@ -59,6 +59,6 @@ public class Card : MonoBehaviour, IPointerDownHandler
     public void OnPointerDown(PointerEventData eventData)
     {
         if (isFlipping) return;
-        onCardTapped?.Invoke(cardID);
+        onCardTapped?.Invoke(this);
     }
 }
