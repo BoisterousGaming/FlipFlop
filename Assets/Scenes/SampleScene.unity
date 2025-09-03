@@ -1185,6 +1185,7 @@ MonoBehaviour:
   rows: 2
   columns: 2
   spacing: {x: 10, y: 10}
+  forceSquare: 0
   cardPrefab: {fileID: 2197183578120446727, guid: ab666408fb427f84da99656bd0a738c3, type: 3}
   backSprite: {fileID: 21300000, guid: 4c7a580357dfd6846a027667e23aa7d5, type: 3}
   cardFrontSprites:

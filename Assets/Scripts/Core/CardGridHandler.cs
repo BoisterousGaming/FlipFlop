@@ -7,6 +7,7 @@ public class CardGridHandler : MonoBehaviour
     [Min(2)] [SerializeField] private int rows = 2;
     [Min(2)] [SerializeField] private int columns = 2;
     [SerializeField] private Vector2 spacing = new Vector2(10f, 10f);
+    [SerializeField] private bool forceSquare = true; // This bool allow to toggle between square vs rectangle card shape
     [SerializeField] private GameObject cardPrefab;
     [SerializeField] private Sprite backSprite;
     [SerializeField] private List<Sprite> cardFrontSprites = new();
@@ -75,6 +76,13 @@ public class CardGridHandler : MonoBehaviour
 
         float cellWidth = (containerWidth - (spacing.x * (columns - 1))) / columns;
         float cellHeight = (containerHeight - (spacing.y * (rows - 1))) / rows;
+
+        // If force square, pick the smaller dimension
+        if (forceSquare)
+        {
+            float cellSize = Mathf.Min(cellWidth, cellHeight);
+            cellWidth = cellHeight = cellSize;
+        }
 
         float totalGridWidth = (cellWidth * columns) + (spacing.x * (columns - 1));
         float totalGridHeight = (cellHeight * rows) + (spacing.y * (rows - 1));
