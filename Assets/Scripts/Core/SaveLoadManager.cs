@@ -34,5 +34,7 @@ public static class SaveLoadManager
     {
         PlayerPrefs.DeleteKey(Constants.SAVE_KEY);
         PlayerPrefs.Save();
+
+        Debug.Log("Save data cleared.");
     }
 }

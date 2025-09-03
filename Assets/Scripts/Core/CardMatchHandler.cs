@@ -14,13 +14,12 @@ public class CardMatchHandler : MonoBehaviour
     private Card lastFlippedCard;
 
     private float cardDestroyDelay;
-    private int score = 0;
+    private int currentScore = 0;
 
     private readonly HashSet<int> matchedCardIDs = new();
     public IReadOnlyCollection<int> MatchedCardIDs => matchedCardIDs;
 
-
-    public void Initialize(CardGridHandler handler, float cardDestroyDelay, Action<int> onMatch, Action<int, int> onMismatch, Action onAllMatched, Action<int> onScoreChanged, out Action<Card> onCardTapped, out Action<Card> onCardClosed)
+    public void Initialize(CardGridHandler handler, float cardDestroyDelay, int currentScore, Action<int> onMatch, Action<int, int> onMismatch, Action onAllMatched, Action<int> onScoreChanged, out Action<Card> onCardTapped, out Action<Card> onCardClosed)
     {
         gridHandler = handler;
         lastFlippedCard = null;
@@ -29,8 +28,9 @@ public class CardMatchHandler : MonoBehaviour
         this.onMismatch = onMismatch;
         this.onAllMatched = onAllMatched;
         this.onScoreChanged = onScoreChanged;
-
+        
         this.cardDestroyDelay = cardDestroyDelay;
+        this.currentScore = currentScore;
 
         onCardTapped = HandleCardTapped;
         onCardClosed = HandleCardClosed;
@@ -47,8 +47,8 @@ public class CardMatchHandler : MonoBehaviour
                 onMatch?.Invoke(tappedCard.CardID);
                 DestroyMatched(lastFlippedCard, tappedCard);
 
-                score += 100;
-                onScoreChanged?.Invoke(score);
+                currentScore += 100;
+                onScoreChanged?.Invoke(currentScore);
 
                 lastFlippedCard = null;
                 return;
@@ -57,10 +57,10 @@ public class CardMatchHandler : MonoBehaviour
             {
                 onMismatch?.Invoke(lastFlippedCard.CardID, tappedCard.CardID);
 
-                score -= 10;
-                if (score < 0)
-                    score = 0;
-                onScoreChanged?.Invoke(score);
+                currentScore -= 10;
+                if (currentScore < 0)
+                    currentScore = 0;
+                onScoreChanged?.Invoke(currentScore);
             }
         }
 

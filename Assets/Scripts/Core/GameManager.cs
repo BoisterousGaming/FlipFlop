@@ -31,7 +31,7 @@ public class GameManager : MonoBehaviour
             currenctScore = saveData.score;
             uiManager.Gameplay.SetVisibilityState(true);
             uiManager.Gameplay.OnScoreChanged(currenctScore);
-            matchHandler.Initialize(gridHandler, cardDestroyDelay, HandleMatch, HandleMismatch, HandleAllMatched, (score) =>
+            matchHandler.Initialize(gridHandler, cardDestroyDelay, currenctScore, HandleMatch, HandleMismatch, HandleAllMatched, (score) =>
             {
                 currenctScore = score;
                 uiManager.Gameplay.OnScoreChanged(score);
@@ -50,7 +50,7 @@ public class GameManager : MonoBehaviour
             gridHandler.Rows = rows;
             gridHandler.Columns = columns;
 
-            matchHandler.Initialize(gridHandler, cardDestroyDelay, HandleMatch, HandleMismatch, HandleAllMatched, (score) =>
+            matchHandler.Initialize(gridHandler, cardDestroyDelay, currenctScore, HandleMatch, HandleMismatch, HandleAllMatched, (score) =>
             {
                 currenctScore = score;
                 uiManager.Gameplay.OnScoreChanged(score);
@@ -76,7 +76,6 @@ public class GameManager : MonoBehaviour
 
     private void HandleAllMatched()
     {
-        Debug.Log("HandleAllMatched");
         uiManager.Gameplay.SetVisibilityState(false);
         uiManager.GameOver.SetVisibilityState(true);
         AudioSfxHandler.Instance.PlayAudioOneShot(Enums.AudioSfxType.GameOver);
@@ -93,7 +92,7 @@ public class GameManager : MonoBehaviour
         GridData gridData = gridHandler.GetCurrentGridData(
             new List<int>(matchHandler.MatchedCardIDs)
         );
-
-        SaveLoadManager.SaveGame(currenctScore, gridData);
+        if (gridData.cardIDs.Any())
+            SaveLoadManager.SaveGame(currenctScore, gridData);
     }
 }
