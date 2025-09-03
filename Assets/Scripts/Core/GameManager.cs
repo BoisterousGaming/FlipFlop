@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -77,7 +78,10 @@ public class GameManager : MonoBehaviour
     private void HandleAllMatched()
     {
         uiManager.Gameplay.SetVisibilityState(false);
-        uiManager.GameOver.SetVisibilityState(true);
+        uiManager.GameOver.Initialize(() =>
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name, LoadSceneMode.Single);
+        });
         AudioSfxHandler.Instance.PlayAudioOneShot(Enums.AudioSfxType.GameOver);
         SaveLoadManager.ClearSave();
     }
