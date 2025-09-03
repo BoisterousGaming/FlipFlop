@@ -36,29 +36,29 @@ public class Card : MonoBehaviour, IPointerDownHandler
 
     public void ShowCardFront()
     {
-        // if (isFlipping) return;
+        if (isFlipped) return;
+        isFlipped = true;
         isFlipping = true;
         cardFlipper.DoFlip(frontSprite, () =>
         {
             isFlipping = false;
-            isFlipped = true;
         });
     }
 
     public void ShowCardBack()
     {
-        // if (isFlipping) return;
+        if (!isFlipped) return;
+        isFlipped = false;
         isFlipping = true;
         cardFlipper.DoFlip(backSprite, () =>
         {
             isFlipping = false;
-            isFlipped = false;
         });
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        if (isFlipping) return;
+        if (isFlipping || isFlipped) return;
         onCardTapped?.Invoke(this);
     }
 }

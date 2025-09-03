@@ -23,7 +23,7 @@ public class CardFlipper : MonoBehaviour
     {
         if (img == null || imgRect == null) return;
 
-        // Cancel any running flip task
+        // Cancel any ongoing flip animation
         flipCTS?.Cancel();
         flipCTS = new CancellationTokenSource();
 
@@ -34,44 +34,55 @@ public class CardFlipper : MonoBehaviour
 
     private async Task DoFlipTask(Sprite cardSprite, Action onComplete, CancellationToken token)
     {
-        float halfDuration = duration / 2f;
-
-        // Let's srink the card x scale to 0
-        float t = 0f;
-        while (t < halfDuration)
+        try
         {
-            if (token.IsCancellationRequested) return;
+            float halfDuration = duration / 2f;
 
-            t += Time.unscaledDeltaTime;
-            float progress = Mathf.Clamp01(t / halfDuration);
+            // Let's srink the card x scale to 0
+            float t = 0f;
+            while (t < halfDuration)
+            {
+                token.ThrowIfCancellationRequested();
 
-            scaleCache.x = Mathf.Lerp(1f, 0f, progress);
+                t += Time.unscaledDeltaTime;
+                float progress = Mathf.Clamp01(t / halfDuration);
+
+                scaleCache.x = Mathf.Lerp(1f, 0f, progress);
+                imgRect.localScale = scaleCache;
+
+                await Task.Yield();
+            }
+
+            // Card Scale is at 0, let's change the sprite to next visible side of the card.
+            img.sprite = cardSprite;
+
+            // Let's expand the card x scale to 1
+            t = 0f;
+            while (t < halfDuration)
+            {
+                token.ThrowIfCancellationRequested();
+
+                t += Time.unscaledDeltaTime;
+                float progress = Mathf.Clamp01(t / halfDuration);
+
+                scaleCache.x = Mathf.Lerp(0f, 1f, progress);
+                imgRect.localScale = scaleCache;
+
+                await Task.Yield();
+            }
+
+            scaleCache.x = 1f;
             imgRect.localScale = scaleCache;
-
-            await Task.Yield();
         }
-
-        // Card Scale is at 0, let's change the sprite to next visible side of the card.
-        img.sprite = cardSprite;
-
-        // Let's expand the card x scale to 1
-        t = 0f;
-        while (t < halfDuration)
+        catch (OperationCanceledException)
         {
-            if (token.IsCancellationRequested) return;
-
-            t += Time.unscaledDeltaTime;
-            float progress = Mathf.Clamp01(t / halfDuration);
-
-            scaleCache.x = Mathf.Lerp(0f, 1f, progress);
+            // Flip was interrupted → force reset to normal scale
+            scaleCache.x = 1f;
             imgRect.localScale = scaleCache;
-
-            await Task.Yield();
         }
-
-        scaleCache.x = 1f;
-        imgRect.localScale = scaleCache;
-
-        onComplete?.Invoke();
+        finally
+        {
+            onComplete?.Invoke();
+        }
     }
 }

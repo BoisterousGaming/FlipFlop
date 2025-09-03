@@ -9,9 +9,10 @@ public class CardMatchHandler : MonoBehaviour
     [SerializeField] private float maxSingleFlipTime = 0.5f;
     [SerializeField] private float destroyDelay = 0.25f;
 
-    private List<Card> flippedCards = new();
+    public List<Card> flippedCards = new();
     private HashSet<int> matchedCardIDs = new();
     private Coroutine singleFlipTimeoutRoutine;
+    private Coroutine checkMatchRoutine;
 
     private Action<int> onMatch;
     private Action<int, int> onMismatch;
@@ -31,6 +32,7 @@ public class CardMatchHandler : MonoBehaviour
 
         handleCardTapped = HandleCardTapped;
         singleFlipTimeoutRoutine = null;
+        checkMatchRoutine = null;
     }
 
     private void HandleCardTapped(Card tappedCard)
@@ -59,7 +61,11 @@ public class CardMatchHandler : MonoBehaviour
                 singleFlipTimeoutRoutine = null;
             }
 
-            StartCoroutine(CheckMatchRoutine());
+            // Cancel any running check before starting new one
+            if (checkMatchRoutine != null)
+                StopCoroutine(checkMatchRoutine);
+
+            checkMatchRoutine = StartCoroutine(CheckMatchRoutine());
         }
     }
 
@@ -76,8 +82,16 @@ public class CardMatchHandler : MonoBehaviour
             second.ShowCardBack();
             onMismatch?.Invoke(first.CardID, second.CardID);
         }
+
         flippedCards.RemoveRange(0, 2);
-        // flippedCards.Clear();
+        Debug.Log("ForceCloseUnmatchedPair: 2 Cards are closed!");
+
+        // Kill pending match check so it won’t interfere
+        if (checkMatchRoutine != null)
+        {
+            StopCoroutine(checkMatchRoutine);
+            checkMatchRoutine = null;
+        }
     }
 
     private IEnumerator SingleFlipTimeoutRoutine(Card firstCard)
@@ -117,20 +131,20 @@ public class CardMatchHandler : MonoBehaviour
             {
                 onAllMatched?.Invoke();
             }
+
+            flippedCards.RemoveRange(0, 2);
         }
         else
         {
             onMismatch?.Invoke(first.CardID, second.CardID);
+
             yield return new WaitForSecondsRealtime(mismatchDelay);
 
             first.ShowCardBack();
             second.ShowCardBack();
-        }
 
-        if (flippedCards.Count > 2)
             flippedCards.RemoveRange(0, 2);
-        else
-            flippedCards.Clear();
+        }
+        checkMatchRoutine = null;
     }
-
 }
