@@ -4,8 +4,8 @@ using UnityEngine;
 [RequireComponent(typeof(RectTransform))]
 public class CardGridHandler : MonoBehaviour
 {
-    [Min(2)] [SerializeField] private int rows = 2;
-    [Min(2)] [SerializeField] private int columns = 2;
+    [Min(2)][SerializeField] private int rows = 2;
+    [Min(2)][SerializeField] private int columns = 2;
     [SerializeField] private Vector2 spacing = new Vector2(10f, 10f);
     [SerializeField] private bool forceSquare = true; // This bool allow to toggle between square vs rectangle card shape
     [SerializeField] private GameObject cardPrefab;
@@ -90,6 +90,13 @@ public class CardGridHandler : MonoBehaviour
         float startX = -totalGridWidth / 2 + cellWidth / 2;
         float startY = totalGridHeight / 2 - cellHeight / 2;
 
+        // Caches to avoid allocations
+        var sizeCache = Vector2.zero;
+        var posCache = Vector2.zero;
+
+        sizeCache.x = cellWidth;
+        sizeCache.y = cellHeight;
+
         for (int i = 0; i < cards.Count; i++)
         {
             int row = i / columns;
@@ -98,12 +105,13 @@ public class CardGridHandler : MonoBehaviour
             var cardRect = cards[i].GetComponent<RectTransform>();
             if (cardRect == null) continue;
 
-            cardRect.sizeDelta = new Vector2(cellWidth, cellHeight);
+            // Set card size
+            cardRect.sizeDelta = sizeCache;
 
-            float xPos = startX + (cellWidth + spacing.x) * column;
-            float yPos = startY - (cellHeight + spacing.y) * row;
-
-            cardRect.anchoredPosition = new Vector2(xPos, yPos);
+            // Set card position
+            posCache.x = startX + (cellWidth + spacing.x) * column;
+            posCache.y = startY - (cellHeight + spacing.y) * row;
+            cardRect.anchoredPosition = posCache;
         }
     }
 
