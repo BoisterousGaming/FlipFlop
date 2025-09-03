@@ -25,7 +25,7 @@ public class CardGridHandler : MonoBehaviour
     }
 
     // Let's Generate a new card grid with matching pairs
-    public void GenerateGrid(Action<Card> onCardTapped)
+    public void GenerateGrid(Action<Card> onCardTapped, Action<Card> onCardClosed, float cardAutoCloseDelay)
     {
         int totalCards = Rows * Columns;
         if (totalCards % 2 != 0)
@@ -46,7 +46,7 @@ public class CardGridHandler : MonoBehaviour
         }
         Shuffle(ids);
 
-        // Instantiate cards / grid elemments
+        // Instantiate cards
         for (int i = 0; i < totalCards; i++)
         {
             var cardGO = Instantiate(cardPrefab, container);
@@ -59,8 +59,8 @@ public class CardGridHandler : MonoBehaviour
 
             var frontSprite = cardFrontSprites[ids[i] % cardFrontSprites.Count];
 
-            card.SetCardDetails(ids[i], frontSprite, backSprite);
-            card.RegisterOnTapped(onCardTapped);
+            card.SetCardDetails(ids[i], frontSprite, backSprite, cardAutoCloseDelay);
+            card.RegisterCallbacks(onCardTapped, onCardClosed);
 
             cards.Add(card);
         }

@@ -9,6 +9,9 @@ public class GameManager : MonoBehaviour
     [SerializeField][Min(2)] private int rows = 4;
     [SerializeField][Min(2)] private int columns = 4;
 
+    [SerializeField] private float cardAutoCloseDelay = 0.5f;
+    [SerializeField] private float cardDestroyDelay = 0.25f;
+
     private void Start()
     {
         StartNewGame();
@@ -19,8 +22,8 @@ public class GameManager : MonoBehaviour
         gridHandler.Rows = rows;
         gridHandler.Columns = columns;
 
-        matchHandler.Initialize(gridHandler, HandleMatch, HandleMismatch, HandleAllMatched, out Action<Card> handleCardTapped);
-        gridHandler.GenerateGrid(handleCardTapped);
+        matchHandler.Initialize(gridHandler, cardDestroyDelay, HandleMatch, HandleMismatch, HandleAllMatched, out Action<Card> handleCardTapped, out Action<Card> onCardClosed);
+        gridHandler.GenerateGrid(handleCardTapped, onCardClosed, cardAutoCloseDelay);
     }
 
     private void HandleMatch(int cardID)
