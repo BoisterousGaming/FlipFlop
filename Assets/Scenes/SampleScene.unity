@@ -577,8 +577,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c943b0d8d540c2c4d9df6f570920fdfe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  frontSprite: {fileID: 0}
-  backSprite: {fileID: 0}
+  frontSprite: {fileID: 21300000, guid: f2d91cffef557a94791401e98f7dcc86, type: 3}
+  backSprite: {fileID: 21300000, guid: 4c7a580357dfd6846a027667e23aa7d5, type: 3}
   cardFlipper: {fileID: 0}
   cardGridHandler: {fileID: 2135199692}
 --- !u!1 &1058486465
@@ -1182,8 +1182,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7342bb13fc320244e9b67212547fbebb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rows: 4
-  columns: 5
+  rows: 2
+  columns: 2
   spacing: {x: 10, y: 10}
   cardPrefab: {fileID: 2197183578120446727, guid: ab666408fb427f84da99656bd0a738c3, type: 3}
   backSprite: {fileID: 21300000, guid: 4c7a580357dfd6846a027667e23aa7d5, type: 3}

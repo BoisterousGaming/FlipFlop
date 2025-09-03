@@ -21,6 +21,7 @@ public class CardGridHandler : MonoBehaviour
         container = GetComponent<RectTransform>();
     }
 
+    // Let's Generate a new card grid with matching pairs
     public void GenerateGrid(System.Action<int> onCardTapped)
     {
         int totalCards = rows * columns;
@@ -33,6 +34,7 @@ public class CardGridHandler : MonoBehaviour
         ClearGrid();
         cards.Clear();
 
+        // Build shuffled ID list (two of each ID)
         var ids = new List<int>();
         for (int i = 0; i < totalCards / 2; i++)
         {
@@ -41,6 +43,7 @@ public class CardGridHandler : MonoBehaviour
         }
         Shuffle(ids);
 
+        // Instantiate cards / grid elemments
         for (int i = 0; i < totalCards; i++)
         {
             var cardGO = Instantiate(cardPrefab, container);
@@ -62,11 +65,41 @@ public class CardGridHandler : MonoBehaviour
         UpdateGridLayout();
     }
 
+    // Update positions and sizes of all cards to fit inside the container
     public void UpdateGridLayout()
     {
-        // TODO - Update positions and sizes of all cards to fit container
+        if (rows <= 0 || columns <= 0) return;
+
+        float containerWidth = container.rect.width;
+        float containerHeight = container.rect.height;
+
+        float cellWidth = (containerWidth - (spacing.x * (columns - 1))) / columns;
+        float cellHeight = (containerHeight - (spacing.y * (rows - 1))) / rows;
+
+        float totalGridWidth = (cellWidth * columns) + (spacing.x * (columns - 1));
+        float totalGridHeight = (cellHeight * rows) + (spacing.y * (rows - 1));
+
+        float startX = -totalGridWidth / 2 + cellWidth / 2;
+        float startY = totalGridHeight / 2 - cellHeight / 2;
+
+        for (int i = 0; i < cards.Count; i++)
+        {
+            int row = i / columns;
+            int column = i % columns;
+
+            var cardRect = cards[i].GetComponent<RectTransform>();
+            if (cardRect == null) continue;
+
+            cardRect.sizeDelta = new Vector2(cellWidth, cellHeight);
+
+            float xPos = startX + (cellWidth + spacing.x) * column;
+            float yPos = startY - (cellHeight + spacing.y) * row;
+
+            cardRect.anchoredPosition = new Vector2(xPos, yPos);
+        }
     }
 
+    // Clear the grid once it's not required
     private void ClearGrid()
     {
         for (int i = container.childCount - 1; i >= 0; i--)
@@ -77,6 +110,10 @@ public class CardGridHandler : MonoBehaviour
 
     private void Shuffle<T>(List<T> list)
     {
-        // TODO - Assign ids to individual cards
+        for (int i = list.Count - 1; i > 0; i--)
+        {
+            int rand = Random.Range(0, i + 1);
+            (list[i], list[rand]) = (list[rand], list[i]);
+        }
     }
 }
