@@ -91,6 +91,16 @@ public class GameManager : MonoBehaviour
         SaveCurrentGame();
     }
 
+#if UNITY_ANDROID
+    private void OnApplicationPause(bool pause)
+    {
+        if (pause)
+        {
+            SaveCurrentGame();
+        }
+    }
+#endif
+
     private void SaveCurrentGame()
     {
         GridData gridData = gridHandler.GetCurrentGridData(
