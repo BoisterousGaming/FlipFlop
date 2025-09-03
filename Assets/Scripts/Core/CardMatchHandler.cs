@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -14,6 +15,10 @@ public class CardMatchHandler : MonoBehaviour
 
     private float cardDestroyDelay;
     private int score = 0;
+
+    private readonly HashSet<int> matchedCardIDs = new();
+    public IReadOnlyCollection<int> MatchedCardIDs => matchedCardIDs;
+
 
     public void Initialize(CardGridHandler handler, float cardDestroyDelay, Action<int> onMatch, Action<int, int> onMismatch, Action onAllMatched, Action<int> onScoreChanged, out Action<Card> onCardTapped, out Action<Card> onCardClosed)
     {
@@ -62,7 +67,6 @@ public class CardMatchHandler : MonoBehaviour
         lastFlippedCard = tappedCard;
     }
 
-
     private void HandleCardClosed(Card closedCard)
     {
         if (lastFlippedCard == closedCard)
@@ -74,6 +78,8 @@ public class CardMatchHandler : MonoBehaviour
     private async void DestroyMatched(Card first, Card second)
     {
         await Task.Delay((int)(cardDestroyDelay * 1000));
+
+        matchedCardIDs.Add(first.CardID);
 
         gridHandler.RemoveCard(first);
         gridHandler.RemoveCard(second);

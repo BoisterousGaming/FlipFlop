@@ -25,19 +25,18 @@ public class CardGridHandler : MonoBehaviour
     }
 
     // Let's Generate a new card grid with matching pairs
-    public void GenerateGrid(Action<Card> onCardTapped, Action<Card> onCardClosed, float cardAutoCloseDelay)
+    public GridData GenerateGrid(Action<Card> onCardTapped, Action<Card> onCardClosed, float cardAutoCloseDelay)
     {
         int totalCards = Rows * Columns;
         if (totalCards % 2 != 0)
         {
             Debug.LogError("Total cards must be even to form pairs!");
-            return;
+            return null;
         }
 
         ClearGrid();
         cards.Clear();
 
-        // Build shuffled ID list (two of each ID)
         var ids = new List<int>();
         for (int i = 0; i < totalCards / 2; i++)
         {
@@ -46,21 +45,65 @@ public class CardGridHandler : MonoBehaviour
         }
         Shuffle(ids);
 
-        // Instantiate cards
-        for (int i = 0; i < totalCards; i++)
+        var data = new GridData
         {
+            rows = Rows,
+            columns = Columns,
+            cardIDs = new List<int>(ids),
+            destroyedCardIDs = new List<int>()
+        };
+
+        for (int i = 0; i < ids.Count; i++)
+        {
+            int id = ids[i];
+
             var cardGO = Instantiate(cardPrefab, container);
             var card = cardGO.GetComponent<Card>();
+
+            var frontSprite = cardFrontSprites[id % cardFrontSprites.Count];
+            card.SetCardDetails(id, frontSprite, backSprite, cardAutoCloseDelay);
+            card.RegisterCallbacks(onCardTapped, onCardClosed);
+
+            cards.Add(card);
+        }
+
+        UpdateGridLayout();
+        return data;
+    }
+
+    // Let's Generate a grid from existing data
+    public void GenerateGridFromData(GridData data, Action<Card> onCardTapped, Action<Card> onCardClosed, float cardAutoCloseDelay)
+    {
+        ClearGrid();
+        cards.Clear();
+
+        Rows = data.rows;
+        Columns = data.columns;
+
+        for (int i = 0; i < data.cardIDs.Count; i++)
+        {
+            int id = data.cardIDs[i];
+
+            var cardGO = Instantiate(cardPrefab, container);
+            var card = cardGO.GetComponent<Card>();
+
             if (card == null)
             {
                 Debug.LogError("Card prefab missing Card script!");
                 continue;
             }
 
-            var frontSprite = cardFrontSprites[ids[i] % cardFrontSprites.Count];
+            var frontSprite = cardFrontSprites[id % cardFrontSprites.Count];
 
-            card.SetCardDetails(ids[i], frontSprite, backSprite, cardAutoCloseDelay);
+            card.SetCardDetails(id, frontSprite, backSprite, cardAutoCloseDelay);
             card.RegisterCallbacks(onCardTapped, onCardClosed);
+
+            // Skip destroyed cards
+            if (data.destroyedCardIDs.Contains(id))
+            {
+                Destroy(cardGO);
+                continue;
+            }
 
             cards.Add(card);
         }
@@ -115,6 +158,24 @@ public class CardGridHandler : MonoBehaviour
             posCache.y = startY - (cellHeight + spacing.y) * row;
             cardRect.anchoredPosition = posCache;
         }
+    }
+
+    public GridData GetCurrentGridData(List<int> destroyedIDs)
+    {
+        var data = new GridData
+        {
+            rows = Rows,
+            columns = Columns,
+            cardIDs = new List<int>(),
+            destroyedCardIDs = destroyedIDs
+        };
+
+        foreach (var card in cards)
+        {
+            data.cardIDs.Add(card.CardID);
+        }
+
+        return data;
     }
 
     // Clear the grid once it's not required

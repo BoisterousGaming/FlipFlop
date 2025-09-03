@@ -8,6 +8,7 @@ public class UiMainMenu : UiCanvas
 
     public void Initialize(Action onClickStartGame)
     {
+        SetVisibilityState(true);
         startGameBtn.onClick.AddListener(() =>
         {
             onClickStartGame?.Invoke();
