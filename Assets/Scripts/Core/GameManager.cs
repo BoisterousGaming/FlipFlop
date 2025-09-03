@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    [SerializeField] private UiManager uiManager;
     [SerializeField] private CardGridHandler gridHandler;
     [SerializeField] private CardMatchHandler matchHandler;
 
@@ -14,33 +15,33 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        StartNewGame();
+        uiManager.MainMenu.Initialize(StartNewGame);
     }
 
     private void StartNewGame()
     {
+        uiManager.Gameplay.SetVisibilityState(true);
         gridHandler.Rows = rows;
         gridHandler.Columns = columns;
 
-        matchHandler.Initialize(gridHandler, cardDestroyDelay, HandleMatch, HandleMismatch, HandleAllMatched, out Action<Card> handleCardTapped, out Action<Card> onCardClosed);
+        matchHandler.Initialize(gridHandler, cardDestroyDelay, HandleMatch, HandleMismatch, HandleAllMatched, uiManager.Gameplay.OnScoreChanged, out Action<Card> handleCardTapped, out Action<Card> onCardClosed);
         gridHandler.GenerateGrid(handleCardTapped, onCardClosed, cardAutoCloseDelay);
     }
 
     private void HandleMatch(int cardID)
     {
-        // TODO - Write card match logic
         AudioSfxHandler.Instance.PlayAudioOneShot(Enums.AudioSfxType.CardMatch);
     }
 
     private void HandleMismatch(int firstID, int secondID)
     {
-        // TODO - Write card miss match logic
         AudioSfxHandler.Instance.PlayAudioOneShot(Enums.AudioSfxType.CardMissMatch);
     }
 
     private void HandleAllMatched()
     {
-        // TODO - Write game over logic
+        uiManager.Gameplay.SetVisibilityState(false);
+        uiManager.GameOver.SetVisibilityState(true);
         AudioSfxHandler.Instance.PlayAudioOneShot(Enums.AudioSfxType.GameOver);
     }
 }

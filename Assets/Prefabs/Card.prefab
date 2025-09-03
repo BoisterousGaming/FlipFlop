@@ -106,4 +106,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   img: {fileID: 2197183578120446725}
   imgRect: {fileID: 2197183578120446724}
-  duration: 0.5
+  duration: 0.25

@@ -7,13 +7,15 @@ public class CardMatchHandler : MonoBehaviour
     private Action<int> onMatch;
     private Action<int, int> onMismatch;
     private Action onAllMatched;
+    private Action<int> onScoreChanged;
 
     private CardGridHandler gridHandler;
     private Card lastFlippedCard;
 
     private float cardDestroyDelay;
+    private int score = 0;
 
-    public void Initialize(CardGridHandler handler, float cardDestroyDelay, Action<int> onMatch, Action<int, int> onMismatch, Action onAllMatched, out Action<Card> onCardTapped, out Action<Card> onCardClosed)
+    public void Initialize(CardGridHandler handler, float cardDestroyDelay, Action<int> onMatch, Action<int, int> onMismatch, Action onAllMatched, Action<int> onScoreChanged, out Action<Card> onCardTapped, out Action<Card> onCardClosed)
     {
         gridHandler = handler;
         lastFlippedCard = null;
@@ -21,6 +23,7 @@ public class CardMatchHandler : MonoBehaviour
         this.onMatch = onMatch;
         this.onMismatch = onMismatch;
         this.onAllMatched = onAllMatched;
+        this.onScoreChanged = onScoreChanged;
 
         this.cardDestroyDelay = cardDestroyDelay;
 
@@ -37,17 +40,22 @@ public class CardMatchHandler : MonoBehaviour
             if (lastFlippedCard.IsFlipped && tappedCard.CardID == lastFlippedCard.CardID)
             {
                 onMatch?.Invoke(tappedCard.CardID);
-
-                lastFlippedCard.ShowCardBack();
-                tappedCard.ShowCardBack();
-
                 DestroyMatched(lastFlippedCard, tappedCard);
+
+                score += 100;
+                onScoreChanged?.Invoke(score);
+
                 lastFlippedCard = null;
                 return;
             }
             else
             {
                 onMismatch?.Invoke(lastFlippedCard.CardID, tappedCard.CardID);
+
+                score -= 10;
+                if (score < 0)
+                    score = 0;
+                onScoreChanged?.Invoke(score);
             }
         }
 

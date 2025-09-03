@@ -23,7 +23,7 @@ public class CardFlipper : MonoBehaviour
     {
         if (img == null || imgRect == null) return;
 
-        // Cancel any ongoing flip animation
+        // Cancel any ongoing flip task
         flipCTS?.Cancel();
         flipCTS = new CancellationTokenSource();
 
@@ -76,7 +76,6 @@ public class CardFlipper : MonoBehaviour
         }
         catch (OperationCanceledException)
         {
-            // Flip was interrupted → force reset to normal scale
             scaleCache.x = 1f;
             imgRect.localScale = scaleCache;
         }
