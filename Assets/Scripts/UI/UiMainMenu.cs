@@ -11,7 +11,7 @@ public class UiMainMenu : UiCanvas
         SetVisibilityState(true);
         startGameBtn.onClick.AddListener(() =>
         {
-            AudioSfxHandler.Instance.PlayAudio(Enums.AudioSfxType.ButtonClick);
+            AudioSfxHandler.Instance.PlayAudioOneShot(Enums.AudioSfxType.ButtonClick);
             onClickStartGame?.Invoke();
             SetVisibilityState(false);
         });

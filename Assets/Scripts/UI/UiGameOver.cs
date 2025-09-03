@@ -11,7 +11,7 @@ public class UiGameOver : UiCanvas
         SetVisibilityState(true);
         reloadGameBtn.onClick.AddListener(() =>
         {
-            AudioSfxHandler.Instance.PlayAudio(Enums.AudioSfxType.ButtonClick);
+            AudioSfxHandler.Instance.PlayAudioOneShot(Enums.AudioSfxType.ButtonClick);
             onClickReloadGame?.Invoke();
             SetVisibilityState(false);
         });
