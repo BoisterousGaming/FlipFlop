@@ -72,7 +72,11 @@ public class CardGridHandler : MonoBehaviour
     }
 
     // Let's Generate a grid from existing data
-    public void GenerateGridFromData(GridData data, Action<Card> onCardTapped, Action<Card> onCardClosed, float cardAutoCloseDelay)
+    public void GenerateGridFromData(
+        GridData data,
+        Action<Card> onCardTapped,
+        Action<Card> onCardClosed,
+        float cardAutoCloseDelay)
     {
         ClearGrid();
         cards.Clear();
@@ -87,28 +91,23 @@ public class CardGridHandler : MonoBehaviour
             var cardGO = Instantiate(cardPrefab, container);
             var card = cardGO.GetComponent<Card>();
 
-            if (card == null)
-            {
-                Debug.LogError("Card prefab missing Card script!");
-                continue;
-            }
-
             var frontSprite = cardFrontSprites[id % cardFrontSprites.Count];
-
             card.SetCardDetails(id, frontSprite, backSprite, cardAutoCloseDelay);
             card.RegisterCallbacks(onCardTapped, onCardClosed);
 
-            // Skip destroyed cards
             if (data.destroyedCardIDs.Contains(id))
             {
                 Destroy(cardGO);
                 continue;
             }
 
+            var rect = cardGO.GetComponent<RectTransform>();
+            if (i < data.cardPositions.Count)
+                rect.anchoredPosition = data.cardPositions[i];
+            rect.sizeDelta = data.cardSize;
+
             cards.Add(card);
         }
-
-        UpdateGridLayout();
     }
 
     // Update positions and sizes of all cards to fit inside the container
@@ -167,12 +166,24 @@ public class CardGridHandler : MonoBehaviour
             rows = Rows,
             columns = Columns,
             cardIDs = new List<int>(),
-            destroyedCardIDs = destroyedIDs
+            destroyedCardIDs = destroyedIDs,
+            cardPositions = new List<Vector2Serializable>()
         };
 
         foreach (var card in cards)
         {
             data.cardIDs.Add(card.CardID);
+
+            var rect = card.GetComponent<RectTransform>();
+            if (rect != null)
+                data.cardPositions.Add(rect.anchoredPosition);
+        }
+
+        if (cards.Count > 0)
+        {
+            var rect = cards[0].GetComponent<RectTransform>();
+            if (rect != null)
+                data.cardSize = rect.sizeDelta;
         }
 
         return data;
