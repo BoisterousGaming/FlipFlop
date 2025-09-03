@@ -134,4 +134,12 @@ public class CardGridHandler : MonoBehaviour
             (list[i], list[rand]) = (list[rand], list[i]);
         }
     }
+
+    public void RemoveCard(Card card)
+    {
+        if (cards.Contains(card))
+        {
+            cards.Remove(card);
+        }
+    }
 }

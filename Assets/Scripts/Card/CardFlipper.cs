@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,6 +11,7 @@ public class CardFlipper : MonoBehaviour
     [SerializeField] private float duration = 0.5f;
 
     private Vector3 scaleCache = Vector3.one;
+    private CancellationTokenSource flipCTS;
 
     private void Awake()
     {
@@ -20,11 +22,17 @@ public class CardFlipper : MonoBehaviour
     public void DoFlip(Sprite cardSprite, Action onComplete)
     {
         if (img == null || imgRect == null) return;
+
+        // Cancel any running flip task
+        flipCTS?.Cancel();
+        flipCTS = new CancellationTokenSource();
+
         AudioSfxHandler.Instance.PlayAudioOneShot(Enums.AudioSfxType.CardFlip);
-        _ = DoFlipTask(cardSprite, onComplete);
+
+        _ = DoFlipTask(cardSprite, onComplete, flipCTS.Token);
     }
 
-    private async Task DoFlipTask(Sprite cardSprite, Action onComplete)
+    private async Task DoFlipTask(Sprite cardSprite, Action onComplete, CancellationToken token)
     {
         float halfDuration = duration / 2f;
 
@@ -32,11 +40,14 @@ public class CardFlipper : MonoBehaviour
         float t = 0f;
         while (t < halfDuration)
         {
+            if (token.IsCancellationRequested) return;
+
             t += Time.unscaledDeltaTime;
             float progress = Mathf.Clamp01(t / halfDuration);
 
             scaleCache.x = Mathf.Lerp(1f, 0f, progress);
             imgRect.localScale = scaleCache;
+
             await Task.Yield();
         }
 
@@ -47,11 +58,14 @@ public class CardFlipper : MonoBehaviour
         t = 0f;
         while (t < halfDuration)
         {
+            if (token.IsCancellationRequested) return;
+
             t += Time.unscaledDeltaTime;
             float progress = Mathf.Clamp01(t / halfDuration);
 
             scaleCache.x = Mathf.Lerp(0f, 1f, progress);
             imgRect.localScale = scaleCache;
+
             await Task.Yield();
         }
 

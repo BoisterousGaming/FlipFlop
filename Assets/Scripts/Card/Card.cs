@@ -36,7 +36,7 @@ public class Card : MonoBehaviour, IPointerDownHandler
 
     public void ShowCardFront()
     {
-        if (isFlipping) return;
+        // if (isFlipping) return;
         isFlipping = true;
         cardFlipper.DoFlip(frontSprite, () =>
         {
@@ -47,7 +47,7 @@ public class Card : MonoBehaviour, IPointerDownHandler
 
     public void ShowCardBack()
     {
-        if (isFlipping) return;
+        // if (isFlipping) return;
         isFlipping = true;
         cardFlipper.DoFlip(backSprite, () =>
         {
